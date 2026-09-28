@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Sistemas Lineales - Factorización LU (Doolittle)</title>
+    <title>Resolutor de Sistemas Lineales - Métodos Numéricos</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome icons -->
@@ -11,12 +11,11 @@
     <style>
         .matrix-input {
             width: 100%;
-            min-width: 65px;
+            min-width: 60px;
             text-align: center;
         }
-        /* Custom scrollbar para el panel vertical de resultados */
         .custom-scroll-y::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         .custom-scroll-y::-webkit-scrollbar-track {
             background: #f1f5f9;
@@ -26,150 +25,148 @@
             background: #cbd5e1;
             border-radius: 4px;
         }
-        .custom-scroll-y::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col p-4">
 
-    <!-- Header / Navbar -->
-    <header class="bg-slate-900 text-white shadow-md border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <!-- Header / Navbar Superior -->
+    <header class="bg-slate-900 text-white shadow-md rounded-xl p-4 mb-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2.5 rounded-lg text-white shadow-lg">
-                    <i class="fa-solid fa-calculator text-xl"></i>
+                <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                    <i class="fa-solid fa-calculator text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight">Resolutor de Sistemas Lineales</h1>
-                    <p class="text-xs text-slate-400">Método de Factorización LU de Doolittle (A = L · U)</p>
+                    <h1 class="text-lg font-bold tracking-tight">Resolutor de Sistemas Lineales N x N</h1>
+                    <p class="text-xs text-slate-400">Métodos Numéricos: Factorización LU y Método de Jacobi</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg text-xs text-slate-300 border border-slate-700">
-                <i class="fa-solid fa-code text-indigo-400"></i>
-                <span>Soporta Matrices N x N (2 ≤ N ≤ 10)</span>
+            <div class="text-xs bg-slate-800 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-lg">
+                <i class="fa-solid fa-code"></i> Interfaz Optimizada para Capturas
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Layout Principal: Estructura del Diagrama (Izquierda: Opciones | Derecha: Inputs + Resolución) -->
+    <main class="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
 
-        <!-- Panel Izquierdo (MÁS ANCHO: 7 columnas de 12) - Para ingresar datos y tomar capturas -->
-        <section class="lg:col-span-7 flex flex-col gap-6">
-            
-            <!-- Selector de Dimensión N -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-indigo-600"></i> Dimensión del Sistema (N x N)
+        <!-- ================= COLUMNA IZQUIERDA: OPCIONES (3 Columnas) ================= -->
+        <aside class="md:col-span-3 bg-white p-4 rounded-xl border border-slate-300 shadow-sm flex flex-col gap-4">
+            <div class="border-b border-slate-200 pb-2">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-indigo-600"></i> Opciones
                 </h2>
-                <div class="flex items-center gap-4">
-                    <input type="range" id="sizeRange" min="2" max="10" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                    <span id="sizeValue" class="text-lg font-bold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-md border border-indigo-200 min-w-[60px] text-center">3x3</span>
-                </div>
-                <div class="flex justify-between text-xs text-slate-400 mt-1 px-1">
-                    <span>2x2</span>
-                    <span>5x5</span>
-                    <span>10x10</span>
-                </div>
+            </div>
+            
+            <div class="flex flex-col gap-3">
+                <label class="flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-indigo-300 bg-indigo-50/40" id="lblMethodLU">
+                    <input type="radio" name="methodSelect" value="lu" checked class="accent-indigo-600 mt-1">
+                    <div>
+                        <div class="text-xs font-bold text-slate-800">Factorización LU</div>
+                        <div class="text-[11px] text-slate-500">Método Directo (Doolittle: A = L · U)</div>
+                    </div>
+                </label>
+
+                <label class="flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-slate-200" id="lblMethodJacobi">
+                    <input type="radio" name="methodSelect" value="jacobi" class="accent-indigo-600 mt-1">
+                    <div>
+                        <div class="text-xs font-bold text-slate-800">Método de Jacobi</div>
+                        <div class="text-[11px] text-slate-500">Método Iterativo (Verificación EDD)</div>
+                    </div>
+                </label>
             </div>
 
-            <!-- Matriz A y Vector B -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex-1 flex flex-col">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                        <i class="fa-solid fa-table-cells text-indigo-600"></i> Matriz A y Vector b
+            <!-- Ajustes específicos de Jacobi -->
+            <div id="jacobiConfigContainer" class="hidden border-t border-slate-200 pt-3 mt-1 flex flex-col gap-3">
+                <span class="text-[11px] font-bold text-slate-600 uppercase">Parámetros de Iteración</span>
+                <div>
+                    <label class="text-[11px] text-slate-600 block mb-1">Tolerancia Error Relativo:</label>
+                    <input type="number" id="tolInput" value="0.0001" step="any" class="w-full border border-slate-300 rounded px-2 py-1 text-xs">
+                </div>
+                <div>
+                    <label class="text-[11px] text-slate-600 block mb-1">Máx. Iteraciones:</label>
+                    <input type="number" id="maxIterInput" value="100" min="1" max="1000" class="w-full border border-slate-300 rounded px-2 py-1 text-xs">
+                </div>
+            </div>
+        </aside>
+
+        <!-- ================= COLUMNA DERECHA: INPUTS + RESOLUCIÓN (9 Columnas) ================= -->
+        <section class="md:col-span-9 flex flex-col gap-4">
+
+            <!-- BLOQUE SUPERIOR: INPUTS NECESARIOS -->
+            <div class="bg-white p-4 rounded-xl border border-slate-300 shadow-sm flex flex-col gap-3">
+                <div class="flex flex-wrap justify-between items-center border-b border-slate-200 pb-2 gap-2">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> Inputs Necesarios
                     </h2>
-                    <div class="flex gap-2">
-                        <button id="btnRandom" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-md font-medium transition flex items-center gap-1 border border-slate-300">
-                            <i class="fa-solid fa-dice text-slate-500"></i> Aleatorio
+                    
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-600">Dimensión:</span>
+                            <input type="range" id="sizeRange" min="2" max="10" value="3" class="w-24 h-1.5 bg-slate-200 rounded appearance-none cursor-pointer accent-indigo-600">
+                            <span id="sizeValue" class="text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">3x3</span>
+                        </div>
+                        <button id="btnRandom" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded border border-slate-300 font-medium transition flex items-center gap-1">
+                            <i class="fa-solid fa-dice"></i> Aleatorio
                         </button>
-                        <button id="btnClear" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-md font-medium transition flex items-center gap-1 border border-slate-300">
-                            <i class="fa-solid fa-trash-can text-slate-500"></i> Limpiar
+                        <button id="btnClear" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded border border-slate-300 font-medium transition flex items-center gap-1">
+                            <i class="fa-solid fa-eraser"></i> Limpiar
                         </button>
                     </div>
                 </div>
 
-                <!-- Grid de Entrada (Visualización Completa para Captura de Pantalla) -->
-                <div class="w-full overflow-x-auto py-2 flex-1 flex justify-center items-start">
-                    <div id="matrixContainer" class="w-full">
-                        <!-- Generado Dinámicamente por JS -->
-                    </div>
+                <!-- Vector Inicial x(0) para Jacobi -->
+                <div id="vectorX0Container" class="hidden p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                    <span class="text-[11px] font-bold text-slate-600 block mb-1">Vector Inicial x<sup>(0)</sup>:</span>
+                    <div id="x0Inputs" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Entrada de Matriz A y Vector b -->
+                <div class="overflow-x-auto py-1">
+                    <div id="matrixContainer" class="min-w-full"></div>
                 </div>
 
                 <!-- Botón Resolver -->
-                <button id="btnSolve" class="w-full mt-5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition flex items-center justify-center gap-2 text-sm">
-                    <i class="fa-solid fa-play"></i> Calcular Factorización LU
+                <button id="btnSolve" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play"></i> CALCULAR SOLUCIÓN
                 </button>
             </div>
-        </section>
 
-        <!-- Panel Derecho (MÁS ESTRECHO: 5 columnas de 12) - Con Scroll Vertical para ver hacia abajo -->
-        <section class="lg:col-span-5 flex flex-col gap-6">
-            
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm h-[calc(100vh-140px)] min-h-[550px] flex flex-col">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
-                    <i class="fa-solid fa-square-root-variable text-indigo-600"></i> Resultados y Descomposición
-                </h2>
-
-                <div id="resultsPlaceholder" class="flex-1 flex flex-col items-center justify-center text-slate-400 py-12">
-                    <i class="fa-solid fa-calculator text-4xl mb-3 text-slate-300"></i>
-                    <p class="text-sm font-medium text-center">Ingresa los coeficientes y presiona "Calcular Factorización LU"</p>
+            <!-- BLOQUE INFERIOR: RESOLUCIÓN -->
+            <div class="bg-white p-4 rounded-xl border border-slate-300 shadow-sm flex flex-col gap-3 min-h-[350px]">
+                <div class="border-b border-slate-200 pb-2">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
+                        <i class="fa-solid fa-square-root-variable text-indigo-600"></i> Resolución
+                    </h2>
                 </div>
 
-                <!-- Contenedor con Scroll Vertical para fluir hacia abajo -->
-                <div id="resultsContainer" class="hidden flex-1 overflow-y-auto custom-scroll-y pr-2 space-y-5">
-                    
-                    <!-- Alerta de Estado -->
-                    <div id="statusAlert" class="p-3 rounded-lg text-xs flex items-center gap-2"></div>
+                <div id="resultsPlaceholder" class="flex-1 flex flex-col items-center justify-center text-slate-400 py-8">
+                    <i class="fa-solid fa-calculator text-3xl mb-2 text-slate-300"></i>
+                    <p class="text-xs font-medium">Ingresa los datos y presiona "CALCULAR SOLUCIÓN" para ver los resultados.</p>
+                </div>
 
-                    <!-- Solución del Vector X -->
-                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-2">Vector Solución (x)</h3>
-                        <div id="vectorXResult" class="text-xs font-mono text-indigo-950 overflow-x-auto py-1"></div>
+                <div id="resultsContainer" class="hidden flex-col gap-4">
+                    <!-- Estado / Alerta -->
+                    <div id="statusAlert" class="p-2.5 rounded-lg text-xs flex items-center gap-2"></div>
+
+                    <!-- Vector Solución X -->
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-1.5">Vector Solución Final (x)</h3>
+                        <div id="vectorXResult" class="text-xs font-mono text-indigo-950 overflow-x-auto"></div>
                     </div>
 
-                    <!-- Matriz L -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center justify-between">
-                            <span>Matriz Triangular Inferior (L)</span>
-                            <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">Diag = 1</span>
-                        </h3>
-                        <div id="matrixLResult" class="overflow-x-auto text-xs font-mono"></div>
-                    </div>
-
-                    <!-- Matriz U -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
-                            Matriz Triangular Superior (U)
-                        </h3>
-                        <div id="matrixUResult" class="overflow-x-auto text-xs font-mono"></div>
-                    </div>
-
-                    <!-- Vector Intermedio Y -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Vector Intermedio (y)</h3>
-                        <div id="vectorYResult" class="text-xs font-mono overflow-x-auto"></div>
-                    </div>
-
-                    <!-- Comprobación L * U -->
-                    <div class="border border-slate-200 rounded-lg p-3.5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
-                            <i class="fa-solid fa-check-circle text-emerald-600"></i> Comprobación: L · U
-                        </h3>
-                        <div id="matrixLUCheckResult" class="overflow-x-auto text-xs font-mono text-slate-700"></div>
-                    </div>
+                    <!-- Panel Dinámico de Resultados (LU / Jacobi) -->
+                    <div id="dynamicResultsPanel" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
 
                     <!-- Desglose de Pasos -->
-                    <div class="border-t border-slate-200 pt-3">
+                    <div class="border-t border-slate-200 pt-2">
                         <button id="toggleStepsBtn" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
                             <i class="fa-solid fa-chevron-down transition-transform" id="stepsChevron"></i>
-                            <span>Procedimiento paso a paso</span>
+                            <span id="stepsBtnLabel">Ver detalle del procedimiento</span>
                         </button>
-                        <div id="stepsContainer" class="hidden mt-3 space-y-2 text-[11px] font-mono bg-slate-900 text-slate-100 p-3 rounded-lg overflow-x-auto">
+                        <div id="stepsContainer" class="hidden mt-2 space-y-1 text-[11px] font-mono bg-slate-900 text-slate-100 p-3 rounded-lg overflow-x-auto max-h-60 custom-scroll-y">
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -177,14 +174,7 @@
 
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-3 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-            Calculadora Numérica General &bull; Algoritmo de Doolittle para Matrices N x N
-        </div>
-    </footer>
-
-    <!-- Logic JS -->
+    <!-- Script de Lógica -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sizeRange = document.getElementById('sizeRange');
@@ -198,58 +188,85 @@
             const toggleStepsBtn = document.getElementById('toggleStepsBtn');
             const stepsContainer = document.getElementById('stepsContainer');
             const stepsChevron = document.getElementById('stepsChevron');
+            const jacobiConfigContainer = document.getElementById('jacobiConfigContainer');
+            const vectorX0Container = document.getElementById('vectorX0Container');
+            const x0Inputs = document.getElementById('x0Inputs');
+            const dynamicResultsPanel = document.getElementById('dynamicResultsPanel');
 
             let N = parseInt(sizeRange.value);
 
-            // Generar la tabla de entrada de Matriz A y Vector B
+            // Cambio de Método
+            const methodRadios = document.querySelectorAll('input[name="methodSelect"]');
+            methodRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const method = e.target.value;
+                    document.getElementById('lblMethodLU').className = method === 'lu' ? 
+                        'flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-indigo-300 bg-indigo-50/40' : 
+                        'flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-slate-200';
+                    document.getElementById('lblMethodJacobi').className = method === 'jacobi' ? 
+                        'flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-indigo-300 bg-indigo-50/40' : 
+                        'flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-slate-200';
+
+                    if (method === 'jacobi') {
+                        jacobiConfigContainer.classList.remove('hidden');
+                        vectorX0Container.classList.remove('hidden');
+                    } else {
+                        jacobiConfigContainer.classList.add('hidden');
+                        vectorX0Container.classList.add('hidden');
+                    }
+                });
+            });
+
+            // Renderizado de la matriz N x N
             function renderMatrixInput(size) {
                 N = size;
                 sizeValue.textContent = `${N}x${N}`;
 
                 let html = '<table class="w-full border-collapse mx-auto"><thead><tr>';
-                
-                // Headers A
                 for (let j = 0; j < N; j++) {
-                    html += `<th class="px-1 py-1.5 text-xs font-semibold text-slate-500 text-center">x<sub>${j+1}</sub></th>`;
+                    html += `<th class="px-1 py-1 text-xs font-semibold text-slate-500 text-center">x<sub>${j+1}</sub></th>`;
                 }
-                // Separador y Header b
-                html += `<th class="px-2 py-1.5 text-xs font-semibold text-indigo-600 border-l-2 border-slate-300 text-center">b</th></tr></thead><tbody>`;
+                html += `<th class="px-2 py-1 text-xs font-semibold text-indigo-600 border-l-2 border-slate-300 text-center">b</th></tr></thead><tbody>`;
 
                 for (let i = 0; i < N; i++) {
                     html += '<tr>';
-                    // Coeficientes A
                     for (let j = 0; j < N; j++) {
                         html += `
                             <td class="p-1">
-                                <input type="number" step="any" data-row="${i}" data-col="${j}" class="cell-a matrix-input border border-slate-300 rounded-md px-2 py-1.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" placeholder="a${i+1}${j+1}" value="0">
+                                <input type="number" step="any" data-row="${i}" data-col="${j}" class="cell-a matrix-input border border-slate-300 rounded px-1.5 py-1 text-xs focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="a${i+1}${j+1}" value="0">
                             </td>`;
                     }
-                    // Vector B
                     html += `
                         <td class="p-1 border-l-2 border-slate-300 bg-indigo-50/40">
-                            <input type="number" step="any" data-row="${i}" class="cell-b matrix-input border border-indigo-300 rounded-md px-2 py-1.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none font-semibold text-indigo-900 transition" placeholder="b${i+1}" value="0">
+                            <input type="number" step="any" data-row="${i}" class="cell-b matrix-input border border-indigo-300 rounded px-1.5 py-1 text-xs font-semibold text-indigo-900 outline-none" placeholder="b${i+1}" value="0">
                         </td>`;
                     html += '</tr>';
                 }
                 html += '</tbody></table>';
-
                 matrixContainer.innerHTML = html;
+
+                // Inputs para x0 (Jacobi)
+                let x0Html = '';
+                for (let i = 0; i < N; i++) {
+                    x0Html += `
+                        <div class="flex items-center gap-1">
+                            <span class="text-xs text-slate-500">x<sub>${i+1}</sub><sup>(0)</sup>:</span>
+                            <input type="number" step="any" data-idx="${i}" class="cell-x0 w-14 border border-slate-300 rounded px-1 py-0.5 text-xs text-center outline-none" value="0">
+                        </div>`;
+                }
+                x0Inputs.innerHTML = x0Html;
             }
 
-            // Inicializar matriz por defecto (3x3)
             renderMatrixInput(3);
 
-            // Cambiar tamaño
             sizeRange.addEventListener('input', (e) => {
                 renderMatrixInput(parseInt(e.target.value));
             });
 
-            // Limpiar matriz
             btnClear.addEventListener('click', () => {
-                document.querySelectorAll('.cell-a, .cell-b').forEach(input => input.value = '0');
+                document.querySelectorAll('.cell-a, .cell-b, .cell-x0').forEach(input => input.value = '0');
             });
 
-            // Generar valores aleatorios simples (-10 a 10)
             btnRandom.addEventListener('click', () => {
                 document.querySelectorAll('.cell-a').forEach(input => {
                     input.value = Math.floor(Math.random() * 21) - 10;
@@ -257,9 +274,11 @@
                 document.querySelectorAll('.cell-b').forEach(input => {
                     input.value = Math.floor(Math.random() * 30) - 15;
                 });
+                document.querySelectorAll('.cell-x0').forEach(input => {
+                    input.value = 0;
+                });
             });
 
-            // Mostrar/Ocultar pasos
             toggleStepsBtn.addEventListener('click', () => {
                 const isHidden = stepsContainer.classList.contains('hidden');
                 if (isHidden) {
@@ -271,9 +290,8 @@
                 }
             });
 
-            // Función para renderizar matriz como tabla HTML
             function matrixToHTML(matrix, precision = 4) {
-                let html = '<table class="border-collapse my-1 w-full"><tbody>';
+                let html = '<table class="border-collapse my-1 w-full text-xs"><tbody>';
                 for (let i = 0; i < matrix.length; i++) {
                     html += '<tr>';
                     for (let j = 0; j < matrix[i].length; j++) {
@@ -290,14 +308,16 @@
                 let html = '<div class="flex flex-wrap gap-2">';
                 vec.forEach((v, idx) => {
                     const val = Number.isInteger(v) ? v : v.toFixed(precision);
-                    html += `<span class="bg-white border border-slate-300 px-2.5 py-1 rounded shadow-sm"><b>${name}<sub>${idx+1}</sub></b> = ${val}</span>`;
+                    html += `<span class="bg-white border border-slate-300 px-2 py-0.5 rounded shadow-sm"><b>${name}<sub>${idx+1}</sub></b> = ${val}</span>`;
                 });
                 html += '</div>';
                 return html;
             }
 
-            // ALGORITMO DE DOOLITTLE
+            // Resolver Sistema
             btnSolve.addEventListener('click', () => {
+                const selectedMethod = document.querySelector('input[name="methodSelect"]:checked').value;
+
                 const A = Array.from({ length: N }, () => Array(N).fill(0));
                 const b = Array(N).fill(0);
 
@@ -318,84 +338,73 @@
                 });
 
                 if (!valid) {
-                    alert('Por favor, ingresa números válidos en todos los campos.');
+                    alert('Ingresa números válidos en la matriz.');
                     return;
                 }
 
+                resultsPlaceholder.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+                resultsContainer.classList.add('flex');
+
+                if (selectedMethod === 'lu') {
+                    solveLU(A, b);
+                } else {
+                    solveJacobi(A, b);
+                }
+            });
+
+            // 1. LU (Doolittle)
+            function solveLU(A, b) {
                 const L = Array.from({ length: N }, () => Array(N).fill(0));
                 const U = Array.from({ length: N }, () => Array(N).fill(0));
                 const steps = [];
 
-                for (let i = 0; i < N; i++) {
-                    L[i][i] = 1.0;
-                }
-
-                steps.push(`=== INICIO DE FACTORIZACIÓN LU ===`);
+                for (let i = 0; i < N; i++) L[i][i] = 1.0;
+                steps.push(`=== FACTORIZACIÓN LU (DOOLITTLE) ===`);
 
                 let singular = false;
 
                 for (let i = 0; i < N; i++) {
                     for (let k = i; k < N; k++) {
                         let sum = 0;
-                        for (let j = 0; j < i; j++) {
-                            sum += L[i][j] * U[j][k];
-                        }
+                        for (let j = 0; j < i; j++) sum += L[i][j] * U[j][k];
                         U[i][k] = A[i][k] - sum;
                         steps.push(`U[${i+1}][${k+1}] = ${A[i][k]} - ${sum.toFixed(4)} = ${U[i][k].toFixed(4)}`);
                     }
 
-                    if (Math.abs(U[i][i]) < 1e-12) {
-                        singular = true;
-                    }
+                    if (Math.abs(U[i][i]) < 1e-12) singular = true;
 
                     for (let k = i + 1; k < N; k++) {
                         let sum = 0;
-                        for (let j = 0; j < i; j++) {
-                            sum += L[k][j] * U[j][i];
-                        }
-                        if (Math.abs(U[i][i]) < 1e-12) {
-                            L[k][i] = 0;
-                        } else {
-                            L[k][i] = (A[k][i] - sum) / U[i][i];
-                        }
+                        for (let j = 0; j < i; j++) sum += L[k][j] * U[j][i];
+                        L[k][i] = Math.abs(U[i][i]) < 1e-12 ? 0 : (A[k][i] - sum) / U[i][i];
                         steps.push(`L[${k+1}][${i+1}] = (${A[k][i]} - ${sum.toFixed(4)}) / ${U[i][i].toFixed(4)} = ${L[k][i].toFixed(4)}`);
                     }
                 }
 
+                const statusAlert = document.getElementById('statusAlert');
                 if (singular) {
-                    document.getElementById('statusAlert').className = 'p-3 rounded-lg text-xs bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-2';
-                    document.getElementById('statusAlert').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span><b>Advertencia:</b> Pivote cercano a cero en U.</span>';
+                    statusAlert.className = 'p-2.5 rounded-lg text-xs bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-2';
+                    statusAlert.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span><b>Advertencia:</b> Pivote nulo en U.</span>';
                 } else {
-                    document.getElementById('statusAlert').className = 'p-3 rounded-lg text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-2';
-                    document.getElementById('statusAlert').innerHTML = '<i class="fa-solid fa-circle-check"></i> <span><b>Factorización exitosa:</b> A descompuesta en L y U.</span>';
+                    statusAlert.className = 'p-2.5 rounded-lg text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-2';
+                    statusAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span><b>Factorización Exitosa:</b> A = L · U completada.</span>';
                 }
 
-                // Sustitución Hacia Adelante
-                steps.push(`\n=== SUSTITUCIÓN HACIA ADELANTE (L · y = b) ===`);
+                // Sustitución Adelante L*y = b
                 const y = Array(N).fill(0);
                 for (let i = 0; i < N; i++) {
                     let sum = 0;
-                    for (let j = 0; j < i; j++) {
-                        sum += L[i][j] * y[j];
-                    }
+                    for (let j = 0; j < i; j++) sum += L[i][j] * y[j];
                     y[i] = b[i] - sum;
-                    steps.push(`y[${i+1}] = ${b[i]} - ${sum.toFixed(4)} = ${y[i].toFixed(4)}`);
                 }
 
-                // Sustitución Hacia Atrás
-                steps.push(`\n=== SUSTITUCIÓN HACIA ATRÁS (U · x = y) ===`);
+                // Sustitución Atrás U*x = y
                 const x = Array(N).fill(0);
                 for (let i = N - 1; i >= 0; i--) {
                     let sum = 0;
-                    for (let j = i + 1; j < N; j++) {
-                        sum += U[i][j] * x[j];
-                    }
-                    if (Math.abs(U[i][i]) > 1e-12) {
-                        x[i] = (y[i] - sum) / U[i][i];
-                    } else {
-                        x[i] = 0;
-                    }
-                    steps.push(`x[${i+1}] = (${y[i].toFixed(4)} - ${sum.toFixed(4)}) / ${U[i][i].toFixed(4)} = ${x[i].toFixed(4)}`);
+                    for (let j = i + 1; j < N; j++) sum += U[i][j] * x[j];
+                    x[i] = Math.abs(U[i][i]) > 1e-12 ? (y[i] - sum) / U[i][i] : 0;
                 }
 
                 // Comprobación L * U
@@ -403,25 +412,150 @@
                 for (let i = 0; i < N; i++) {
                     for (let j = 0; j < N; j++) {
                         let sum = 0;
-                        for (let k = 0; k < N; k++) {
-                            sum += L[i][k] * U[k][j];
-                        }
+                        for (let k = 0; k < N; k++) sum += L[i][k] * U[k][j];
                         LUCheck[i][j] = sum;
                     }
                 }
 
-                // Renderizar Resultados
-                resultsPlaceholder.classList.add('hidden');
-                resultsContainer.classList.remove('hidden');
-
                 document.getElementById('vectorXResult').innerHTML = vectorToHTML(x, 'x');
-                document.getElementById('matrixLResult').innerHTML = matrixToHTML(L);
-                document.getElementById('matrixUResult').innerHTML = matrixToHTML(U);
-                document.getElementById('vectorYResult').innerHTML = vectorToHTML(y, 'y');
-                document.getElementById('matrixLUCheckResult').innerHTML = matrixToHTML(LUCheck);
 
+                dynamicResultsPanel.className = 'grid grid-cols-1 md:grid-cols-2 gap-3';
+                dynamicResultsPanel.innerHTML = `
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <h3 class="text-xs font-bold text-slate-700 mb-1">Matriz Triangular Inferior (L)</h3>
+                        <div class="overflow-x-auto">${matrixToHTML(L)}</div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <h3 class="text-xs font-bold text-slate-700 mb-1">Matriz Triangular Superior (U)</h3>
+                        <div class="overflow-x-auto">${matrixToHTML(U)}</div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <h3 class="text-xs font-bold text-slate-700 mb-1">Vector Intermedio (y)</h3>
+                        <div>${vectorToHTML(y, 'y')}</div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <h3 class="text-xs font-bold text-slate-700 mb-1">Comprobación (L · U)</h3>
+                        <div class="overflow-x-auto">${matrixToHTML(LUCheck)}</div>
+                    </div>
+                `;
+
+                document.getElementById('stepsBtnLabel').textContent = "Procedimiento paso a paso (LU)";
                 document.getElementById('stepsContainer').innerHTML = steps.map(s => `<div>${s}</div>`).join('');
-            });
+            }
+
+            // 2. JACOBI (Actualizado sin caracteres raros)
+            function solveJacobi(A, b) {
+                const tol = parseFloat(document.getElementById('tolInput').value) || 0.0001;
+                const maxIter = parseInt(document.getElementById('maxIterInput').value) || 100;
+                
+                const x0 = [];
+                document.querySelectorAll('.cell-x0').forEach(input => {
+                    x0.push(parseFloat(input.value) || 0);
+                });
+
+                const steps = [];
+                let isEDD = true;
+                const eddDetails = [];
+
+                for (let i = 0; i < N; i++) {
+                    let diag = Math.abs(A[i][i]);
+                    let sum = 0;
+                    for (let j = 0; j < N; j++) {
+                        if (i !== j) sum += Math.abs(A[i][j]);
+                    }
+                    let condition = diag > sum;
+                    if (!condition) isEDD = false;
+                    eddDetails.push({ fila: i + 1, diag, sum, condition });
+                }
+
+                let hasZeroDiag = A.some((row, i) => Math.abs(row[i]) < 1e-12);
+
+                const statusAlert = document.getElementById('statusAlert');
+                if (hasZeroDiag) {
+                    statusAlert.className = 'p-2.5 rounded-lg text-xs bg-red-100 text-red-800 border border-red-300 flex items-center gap-2';
+                    statusAlert.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> <span><b>Error:</b> Hay ceros en la diagonal principal.</span>';
+                    return;
+                }
+
+                if (isEDD) {
+                    statusAlert.className = 'p-2.5 rounded-lg text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-2';
+                    statusAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span><b>Matriz EDD Detectada:</b> Convergencia de Jacobi garantizada.</span>';
+                } else {
+                    statusAlert.className = 'p-2.5 rounded-lg text-xs bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-2';
+                    statusAlert.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span><b>Advertencia:</b> No es EDD. La convergencia no está garantizada.</span>';
+                }
+
+                let currX = [...x0];
+                let iterHistory = [{ iter: 0, x: [...currX], error: null }];
+
+                let converged = false;
+                let k = 0;
+
+                while (k < maxIter && !converged) {
+                    k++;
+                    let nextX = Array(N).fill(0);
+                    
+                    for (let i = 0; i < N; i++) {
+                        let sum = 0;
+                        for (let j = 0; j < N; j++) {
+                            if (i !== j) sum += A[i][j] * currX[j];
+                        }
+                        nextX[i] = (b[i] - sum) / A[i][i];
+                    }
+
+                    let maxError = 0;
+                    for (let i = 0; i < N; i++) {
+                        let err = Math.abs(nextX[i]) > 1e-12 ? Math.abs((nextX[i] - currX[i]) / nextX[i]) : Math.abs(nextX[i] - currX[i]);
+                        if (err > maxError) maxError = err;
+                    }
+
+                    iterHistory.push({ iter: k, x: [...nextX], error: maxError });
+                    steps.push(`Iteración ${k}: x = [${nextX.map(v=>v.toFixed(5)).join(', ')}], Error = ${(maxError*100).toFixed(4)}%`);
+
+                    if (maxError < tol) converged = true;
+                    currX = [...nextX];
+                }
+
+                document.getElementById('vectorXResult').innerHTML = vectorToHTML(currX, 'x');
+
+                let tableHtml = `
+                    <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                        <table class="w-full text-center text-xs border-collapse">
+                            <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                <tr><th class="p-1.5 border-r">k</th>`;
+                for (let j = 0; j < N; j++) tableHtml += `<th class="p-1.5 border-r">x<sub>${j+1}</sub></th>`;
+                tableHtml += `<th class="p-1.5">Error Rel. (%)</th></tr></thead><tbody>`;
+
+                iterHistory.forEach(h => {
+                    tableHtml += `<tr class="border-b font-mono"><td class="p-1 border-r font-bold bg-slate-50">${h.iter}</td>`;
+                    h.x.forEach(val => tableHtml += `<td class="p-1 border-r">${val.toFixed(6)}</td>`);
+                    const errDisp = h.error === null ? '—' : (h.error * 100).toFixed(4) + '%';
+                    tableHtml += `<td class="p-1 text-indigo-700 font-semibold">${errDisp}</td></tr>`;
+                });
+                tableHtml += `</tbody></table></div>`;
+
+                dynamicResultsPanel.className = 'grid grid-cols-1 gap-3';
+                dynamicResultsPanel.innerHTML = `
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <h3 class="text-xs font-bold text-slate-700 mb-1">Análisis Diagonal Dominancia (EDD)</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs font-mono">
+                            ${eddDetails.map(d => `
+                                <div class="bg-white p-1.5 border rounded text-center">
+                                    <div>Fila ${d.fila}: &#124;${d.diag}&#124; ${d.condition ? '>' : '&le;'} ${d.sum}</div>
+                                    <div class="font-bold text-[10px] ${d.condition ? 'text-emerald-600' : 'text-amber-600'}">${d.condition ? 'EDD OK' : 'NO EDD'}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <h3 class="text-xs font-bold text-slate-700 mb-2">Tabla de Iteraciones (${k} iteraciones)</h3>
+                        ${tableHtml}
+                    </div>
+                `;
+
+                document.getElementById('stepsBtnLabel').textContent = "Procedimiento paso a paso (Jacobi)";
+                document.getElementById('stepsContainer').innerHTML = steps.map(s => `<div>${s}</div>`).join('');
+            }
         });
     </script>
 </body>
