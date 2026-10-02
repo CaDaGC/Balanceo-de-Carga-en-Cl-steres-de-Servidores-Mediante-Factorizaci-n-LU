@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resolutor de Sistemas Lineales - Métodos Numéricos</title>
+    <title>Resolutor de Sistemas Lineales y Métodos Numéricos</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome icons -->
@@ -28,7 +28,6 @@
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col p-4">
-
     <!-- Header / Navbar Superior -->
     <header class="bg-slate-900 text-white shadow-md rounded-xl p-4 mb-4">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
@@ -37,8 +36,8 @@
                     <i class="fa-solid fa-calculator text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight">Resolutor de Sistemas Lineales N x N</h1>
-                    <p class="text-xs text-slate-400">Métodos Numéricos: Factorización LU y Método de Jacobi</p>
+                    <h1 class="text-lg font-bold tracking-tight">Resolutor de Sistemas Lineales y Métodos Numéricos</h1>
+                    <p class="text-xs text-slate-400">Factorización LU, Método de Jacobi e Interpolación de Lagrange</p>
                 </div>
             </div>
             <div class="text-xs bg-slate-800 text-indigo-300 border border-slate-700 px-3 py-1.5 rounded-lg">
@@ -46,10 +45,8 @@
             </div>
         </div>
     </header>
-
     <!-- Layout Principal: Estructura del Diagrama (Izquierda: Opciones | Derecha: Inputs + Resolución) -->
     <main class="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
-
         <!-- ================= COLUMNA IZQUIERDA: OPCIONES (3 Columnas) ================= -->
         <aside class="md:col-span-3 bg-white p-4 rounded-xl border border-slate-300 shadow-sm flex flex-col gap-4">
             <div class="border-b border-slate-200 pb-2">
@@ -66,7 +63,6 @@
                         <div class="text-[11px] text-slate-500">Método Directo (Doolittle: A = L · U)</div>
                     </div>
                 </label>
-
                 <label class="flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-slate-200" id="lblMethodJacobi">
                     <input type="radio" name="methodSelect" value="jacobi" class="accent-indigo-600 mt-1">
                     <div>
@@ -74,8 +70,14 @@
                         <div class="text-[11px] text-slate-500">Método Iterativo (Verificación EDD)</div>
                     </div>
                 </label>
+                <label class="flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-slate-200" id="lblMethodLagrange">
+                    <input type="radio" name="methodSelect" value="lagrange" class="accent-indigo-600 mt-1">
+                    <div>
+                        <div class="text-xs font-bold text-slate-800">Interpolación de Lagrange</div>
+                        <div class="text-[11px] text-slate-500">Método Polinómico por Puntos</div>
+                    </div>
+                </label>
             </div>
-
             <!-- Ajustes específicos de Jacobi -->
             <div id="jacobiConfigContainer" class="hidden border-t border-slate-200 pt-3 mt-1 flex flex-col gap-3">
                 <span class="text-[11px] font-bold text-slate-600 uppercase">Parámetros de Iteración</span>
@@ -88,11 +90,17 @@
                     <input type="number" id="maxIterInput" value="100" min="1" max="1000" class="w-full border border-slate-300 rounded px-2 py-1 text-xs">
                 </div>
             </div>
+            <!-- Ajustes específicos de Lagrange -->
+            <div id="lagrangeConfigContainer" class="hidden border-t border-slate-200 pt-3 mt-1 flex flex-col gap-3">
+                <span class="text-[11px] font-bold text-slate-600 uppercase">Parámetros de Interpolación</span>
+                <div>
+                    <label class="text-[11px] text-slate-600 block mb-1">Valor a Evaluar (x opcional):</label>
+                    <input type="number" id="evalXInput" value="" placeholder="Ej: 2.5" step="any" class="w-full border border-slate-300 rounded px-2 py-1 text-xs">
+                </div>
+            </div>
         </aside>
-
         <!-- ================= COLUMNA DERECHA: INPUTS + RESOLUCIÓN (9 Columnas) ================= -->
         <section class="md:col-span-9 flex flex-col gap-4">
-
             <!-- BLOQUE SUPERIOR: INPUTS NECESARIOS -->
             <div class="bg-white p-4 rounded-xl border border-slate-300 shadow-sm flex flex-col gap-3">
                 <div class="flex flex-wrap justify-between items-center border-b border-slate-200 pb-2 gap-2">
@@ -101,8 +109,8 @@
                     </h2>
                     
                     <div class="flex items-center gap-3">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-semibold text-slate-600">Dimensión:</span>
+                        <div class="flex items-center gap-2" id="sizeContainerWrapper">
+                            <span id="sizeLabelText" class="text-xs font-semibold text-slate-600">Dimensión:</span>
                             <input type="range" id="sizeRange" min="2" max="10" value="3" class="w-24 h-1.5 bg-slate-200 rounded appearance-none cursor-pointer accent-indigo-600">
                             <span id="sizeValue" class="text-xs font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">3x3</span>
                         </div>
@@ -114,24 +122,20 @@
                         </button>
                     </div>
                 </div>
-
                 <!-- Vector Inicial x(0) para Jacobi -->
                 <div id="vectorX0Container" class="hidden p-2 bg-slate-50 border border-slate-200 rounded-lg">
                     <span class="text-[11px] font-bold text-slate-600 block mb-1">Vector Inicial x<sup>(0)</sup>:</span>
                     <div id="x0Inputs" class="flex flex-wrap gap-2"></div>
                 </div>
-
-                <!-- Entrada de Matriz A y Vector b -->
+                <!-- Entrada de Matriz A y Vector b / Puntos Lagrange -->
                 <div class="overflow-x-auto py-1">
                     <div id="matrixContainer" class="min-w-full"></div>
                 </div>
-
                 <!-- Botón Resolver -->
                 <button id="btnSolve" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-sm transition text-xs flex items-center justify-center gap-2">
                     <i class="fa-solid fa-play"></i> CALCULAR SOLUCIÓN
                 </button>
             </div>
-
             <!-- BLOQUE INFERIOR: RESOLUCIÓN -->
             <div class="bg-white p-4 rounded-xl border border-slate-300 shadow-sm flex flex-col gap-3 min-h-[350px]">
                 <div class="border-b border-slate-200 pb-2">
@@ -139,25 +143,20 @@
                         <i class="fa-solid fa-square-root-variable text-indigo-600"></i> Resolución
                     </h2>
                 </div>
-
                 <div id="resultsPlaceholder" class="flex-1 flex flex-col items-center justify-center text-slate-400 py-8">
                     <i class="fa-solid fa-calculator text-3xl mb-2 text-slate-300"></i>
                     <p class="text-xs font-medium">Ingresa los datos y presiona "CALCULAR SOLUCIÓN" para ver los resultados.</p>
                 </div>
-
                 <div id="resultsContainer" class="hidden flex-col gap-4">
                     <!-- Estado / Alerta -->
                     <div id="statusAlert" class="p-2.5 rounded-lg text-xs flex items-center gap-2"></div>
-
-                    <!-- Vector Solución X -->
+                    <!-- Vector Solución X / Resultado Principal -->
                     <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-1.5">Vector Solución Final (x)</h3>
+                        <h3 id="resultMainTitle" class="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-1.5">Vector Solución Final (x)</h3>
                         <div id="vectorXResult" class="text-xs font-mono text-indigo-950 overflow-x-auto"></div>
                     </div>
-
-                    <!-- Panel Dinámico de Resultados (LU / Jacobi) -->
+                    <!-- Panel Dinámico de Resultados (LU / Jacobi / Lagrange) -->
                     <div id="dynamicResultsPanel" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-
                     <!-- Desglose de Pasos -->
                     <div class="border-t border-slate-200 pt-2">
                         <button id="toggleStepsBtn" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
@@ -169,16 +168,14 @@
                     </div>
                 </div>
             </div>
-
         </section>
-
     </main>
-
     <!-- Script de Lógica -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sizeRange = document.getElementById('sizeRange');
             const sizeValue = document.getElementById('sizeValue');
+            const sizeLabelText = document.getElementById('sizeLabelText');
             const matrixContainer = document.getElementById('matrixContainer');
             const btnSolve = document.getElementById('btnSolve');
             const btnRandom = document.getElementById('btnRandom');
@@ -189,10 +186,10 @@
             const stepsContainer = document.getElementById('stepsContainer');
             const stepsChevron = document.getElementById('stepsChevron');
             const jacobiConfigContainer = document.getElementById('jacobiConfigContainer');
+            const lagrangeConfigContainer = document.getElementById('lagrangeConfigContainer');
             const vectorX0Container = document.getElementById('vectorX0Container');
             const x0Inputs = document.getElementById('x0Inputs');
             const dynamicResultsPanel = document.getElementById('dynamicResultsPanel');
-
             let N = parseInt(sizeRange.value);
 
             // Cambio de Método
@@ -206,28 +203,44 @@
                     document.getElementById('lblMethodJacobi').className = method === 'jacobi' ? 
                         'flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-indigo-300 bg-indigo-50/40' : 
                         'flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-slate-200';
-
+                    document.getElementById('lblMethodLagrange').className = method === 'lagrange' ? 
+                        'flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-indigo-300 bg-indigo-50/40' : 
+                        'flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition hover:bg-slate-50 border-slate-200';
+                    
                     if (method === 'jacobi') {
                         jacobiConfigContainer.classList.remove('hidden');
+                        lagrangeConfigContainer.classList.add('hidden');
                         vectorX0Container.classList.remove('hidden');
+                        sizeLabelText.textContent = 'Dimensión:';
+                        sizeRange.min = 2; sizeRange.max = 10;
+                        renderMatrixInput(parseInt(sizeRange.value));
+                    } else if (method === 'lagrange') {
+                        jacobiConfigContainer.classList.add('hidden');
+                        lagrangeConfigContainer.classList.remove('hidden');
+                        vectorX0Container.classList.add('hidden');
+                        sizeLabelText.textContent = 'De cuantos puntos a ingresar:';
+                        sizeRange.min = 2; sizeRange.max = 10;
+                        renderLagrangeInput(parseInt(sizeRange.value));
                     } else {
                         jacobiConfigContainer.classList.add('hidden');
+                        lagrangeConfigContainer.classList.add('hidden');
                         vectorX0Container.classList.add('hidden');
+                        sizeLabelText.textContent = 'Dimensión:';
+                        sizeRange.min = 2; sizeRange.max = 10;
+                        renderMatrixInput(parseInt(sizeRange.value));
                     }
                 });
             });
 
-            // Renderizado de la matriz N x N
+            // Renderizado de la matriz N x N (LU y Jacobi)
             function renderMatrixInput(size) {
                 N = size;
                 sizeValue.textContent = `${N}x${N}`;
-
                 let html = '<table class="w-full border-collapse mx-auto"><thead><tr>';
                 for (let j = 0; j < N; j++) {
                     html += `<th class="px-1 py-1 text-xs font-semibold text-slate-500 text-center">x<sub>${j+1}</sub></th>`;
                 }
                 html += `<th class="px-2 py-1 text-xs font-semibold text-indigo-600 border-l-2 border-slate-300 text-center">b</th></tr></thead><tbody>`;
-
                 for (let i = 0; i < N; i++) {
                     html += '<tr>';
                     for (let j = 0; j < N; j++) {
@@ -244,7 +257,7 @@
                 }
                 html += '</tbody></table>';
                 matrixContainer.innerHTML = html;
-
+                
                 // Inputs para x0 (Jacobi)
                 let x0Html = '';
                 for (let i = 0; i < N; i++) {
@@ -257,26 +270,71 @@
                 x0Inputs.innerHTML = x0Html;
             }
 
+            // Renderizado de Puntos para Lagrange (De cuantos puntos a ingresar)
+            function renderLagrangeInput(size) {
+                N = size;
+                sizeValue.textContent = `${N} puntos`;
+                let html = '<div class="text-xs font-bold text-slate-700 mb-2">Ingrese los puntos (x<sub>i</sub>, y<sub>i</sub>):</div>';
+                html += '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">';
+                for (let i = 0; i < N; i++) {
+                    html += `
+                        <div class="flex items-center gap-2 bg-slate-50 p-2 border border-slate-200 rounded-lg">
+                            <span class="text-xs font-bold text-indigo-700 w-12">Punto ${i+1}:</span>
+                            <div class="flex items-center gap-1 flex-1">
+                                <span class="text-[11px] text-slate-500">x =</span>
+                                <input type="number" step="any" data-index="${i}" class="cell-lagrange-x w-full border border-slate-300 rounded px-1.5 py-1 text-xs text-center outline-none" value="${i}">
+                            </div>
+                            <div class="flex items-center gap-1 flex-1">
+                                <span class="text-[11px] text-slate-500">y =</span>
+                                <input type="number" step="any" data-index="${i}" class="cell-lagrange-y w-full border border-slate-300 rounded px-1.5 py-1 text-xs text-center outline-none" value="${i*i}">
+                            </div>
+                        </div>`;
+                }
+                html += '</div>';
+                matrixContainer.innerHTML = html;
+            }
+
             renderMatrixInput(3);
 
             sizeRange.addEventListener('input', (e) => {
-                renderMatrixInput(parseInt(e.target.value));
+                const val = parseInt(e.target.value);
+                const currentMethod = document.querySelector('input[name="methodSelect"]:checked').value;
+                if (currentMethod === 'lagrange') {
+                    renderLagrangeInput(val);
+                } else {
+                    renderMatrixInput(val);
+                }
             });
 
             btnClear.addEventListener('click', () => {
-                document.querySelectorAll('.cell-a, .cell-b, .cell-x0').forEach(input => input.value = '0');
+                const currentMethod = document.querySelector('input[name="methodSelect"]:checked').value;
+                if (currentMethod === 'lagrange') {
+                    document.querySelectorAll('.cell-lagrange-x, .cell-lagrange-y').forEach(input => input.value = '0');
+                } else {
+                    document.querySelectorAll('.cell-a, .cell-b, .cell-x0').forEach(input => input.value = '0');
+                }
             });
 
             btnRandom.addEventListener('click', () => {
-                document.querySelectorAll('.cell-a').forEach(input => {
-                    input.value = Math.floor(Math.random() * 21) - 10;
-                });
-                document.querySelectorAll('.cell-b').forEach(input => {
-                    input.value = Math.floor(Math.random() * 30) - 15;
-                });
-                document.querySelectorAll('.cell-x0').forEach(input => {
-                    input.value = 0;
-                });
+                const currentMethod = document.querySelector('input[name="methodSelect"]:checked').value;
+                if (currentMethod === 'lagrange') {
+                    document.querySelectorAll('.cell-lagrange-x').forEach((input, idx) => {
+                        input.value = idx - Math.floor(N/2);
+                    });
+                    document.querySelectorAll('.cell-lagrange-y').forEach(input => {
+                        input.value = Math.floor(Math.random() * 20) - 10;
+                    });
+                } else {
+                    document.querySelectorAll('.cell-a').forEach(input => {
+                        input.value = Math.floor(Math.random() * 21) - 10;
+                    });
+                    document.querySelectorAll('.cell-b').forEach(input => {
+                        input.value = Math.floor(Math.random() * 30) - 15;
+                    });
+                    document.querySelectorAll('.cell-x0').forEach(input => {
+                        input.value = 0;
+                    });
+                }
             });
 
             toggleStepsBtn.addEventListener('click', () => {
@@ -314,56 +372,96 @@
                 return html;
             }
 
-            // Resolver Sistema
+            // Resolver Sistema / Método
             btnSolve.addEventListener('click', () => {
                 const selectedMethod = document.querySelector('input[name="methodSelect"]:checked').value;
-
-                const A = Array.from({ length: N }, () => Array(N).fill(0));
-                const b = Array(N).fill(0);
-
-                let valid = true;
-                document.querySelectorAll('.cell-a').forEach(input => {
-                    const r = parseInt(input.dataset.row);
-                    const c = parseInt(input.dataset.col);
-                    const val = parseFloat(input.value);
-                    if (isNaN(val)) valid = false;
-                    A[r][c] = val || 0;
-                });
-
-                document.querySelectorAll('.cell-b').forEach(input => {
-                    const r = parseInt(input.dataset.row);
-                    const val = parseFloat(input.value);
-                    if (isNaN(val)) valid = false;
-                    b[r] = val || 0;
-                });
-
-                if (!valid) {
-                    alert('Ingresa números válidos en la matriz.');
-                    return;
-                }
-
                 resultsPlaceholder.classList.add('hidden');
                 resultsContainer.classList.remove('hidden');
                 resultsContainer.classList.add('flex');
 
                 if (selectedMethod === 'lu') {
+                    const A = Array.from({ length: N }, () => Array(N).fill(0));
+                    const b = Array(N).fill(0);
+                    let valid = true;
+                    document.querySelectorAll('.cell-a').forEach(input => {
+                        const r = parseInt(input.dataset.row);
+                        const c = parseInt(input.dataset.col);
+                        const val = parseFloat(input.value);
+                        if (isNaN(val)) valid = false;
+                        A[r][c] = val || 0;
+                    });
+                    document.querySelectorAll('.cell-b').forEach(input => {
+                        const r = parseInt(input.dataset.row);
+                        const val = parseFloat(input.value);
+                        if (isNaN(val)) valid = false;
+                        b[r] = val || 0;
+                    });
+                    if (!valid) {
+                        alert('Ingresa números válidos en la matriz.');
+                        return;
+                    }
+                    document.getElementById('resultMainTitle').textContent = "Vector Solución Final (x)";
                     solveLU(A, b);
-                } else {
+                } else if (selectedMethod === 'jacobi') {
+                    const A = Array.from({ length: N }, () => Array(N).fill(0));
+                    const b = Array(N).fill(0);
+                    let valid = true;
+                    document.querySelectorAll('.cell-a').forEach(input => {
+                        const r = parseInt(input.dataset.row);
+                        const c = parseInt(input.dataset.col);
+                        const val = parseFloat(input.value);
+                        if (isNaN(val)) valid = false;
+                        A[r][c] = val || 0;
+                    });
+                    document.querySelectorAll('.cell-b').forEach(input => {
+                        const r = parseInt(input.dataset.row);
+                        const val = parseFloat(input.value);
+                        if (isNaN(val)) valid = false;
+                        b[r] = val || 0;
+                    });
+                    if (!valid) {
+                        alert('Ingresa números válidos en la matriz.');
+                        return;
+                    }
+                    document.getElementById('resultMainTitle').textContent = "Vector Solución Final (x)";
                     solveJacobi(A, b);
+                } else if (selectedMethod === 'lagrange') {
+                    const xPoints = [];
+                    const yPoints = [];
+                    let valid = true;
+                    document.querySelectorAll('.cell-lagrange-x').forEach(input => {
+                        const val = parseFloat(input.value);
+                        if (isNaN(val)) valid = false;
+                        xPoints.push(val || 0);
+                    });
+                    document.querySelectorAll('.cell-lagrange-y').forEach(input => {
+                        const val = parseFloat(input.value);
+                        if (isNaN(val)) valid = false;
+                        yPoints.push(val || 0);
+                    });
+                    if (!valid) {
+                        alert('Ingresa números válidos en los puntos.');
+                        return;
+                    }
+                    // Verificar x duplicados
+                    const uniqueX = new Set(xPoints);
+                    if (uniqueX.size !== xPoints.length) {
+                        alert('Los valores de x deben ser distintos (sin puntos con la misma coordenada x).');
+                        return;
+                    }
+                    document.getElementById('resultMainTitle').textContent = "Polinomio Interpolante P(x)";
+                    solveLagrange(xPoints, yPoints);
                 }
             });
 
-            // 1. LU (Doolittle)
+            // 1. LU (Doolittle) - Intacto
             function solveLU(A, b) {
                 const L = Array.from({ length: N }, () => Array(N).fill(0));
                 const U = Array.from({ length: N }, () => Array(N).fill(0));
                 const steps = [];
-
                 for (let i = 0; i < N; i++) L[i][i] = 1.0;
                 steps.push(`=== FACTORIZACIÓN LU (DOOLITTLE) ===`);
-
                 let singular = false;
-
                 for (let i = 0; i < N; i++) {
                     for (let k = i; k < N; k++) {
                         let sum = 0;
@@ -371,9 +469,7 @@
                         U[i][k] = A[i][k] - sum;
                         steps.push(`U[${i+1}][${k+1}] = ${A[i][k]} - ${sum.toFixed(4)} = ${U[i][k].toFixed(4)}`);
                     }
-
                     if (Math.abs(U[i][i]) < 1e-12) singular = true;
-
                     for (let k = i + 1; k < N; k++) {
                         let sum = 0;
                         for (let j = 0; j < i; j++) sum += L[k][j] * U[j][i];
@@ -381,7 +477,6 @@
                         steps.push(`L[${k+1}][${i+1}] = (${A[k][i]} - ${sum.toFixed(4)}) / ${U[i][i].toFixed(4)} = ${L[k][i].toFixed(4)}`);
                     }
                 }
-
                 const statusAlert = document.getElementById('statusAlert');
                 if (singular) {
                     statusAlert.className = 'p-2.5 rounded-lg text-xs bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-2';
@@ -390,24 +485,18 @@
                     statusAlert.className = 'p-2.5 rounded-lg text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-2';
                     statusAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span><b>Factorización Exitosa:</b> A = L · U completada.</span>';
                 }
-
-                // Sustitución Adelante L*y = b
                 const y = Array(N).fill(0);
                 for (let i = 0; i < N; i++) {
                     let sum = 0;
                     for (let j = 0; j < i; j++) sum += L[i][j] * y[j];
                     y[i] = b[i] - sum;
                 }
-
-                // Sustitución Atrás U*x = y
                 const x = Array(N).fill(0);
                 for (let i = N - 1; i >= 0; i--) {
                     let sum = 0;
                     for (let j = i + 1; j < N; j++) sum += U[i][j] * x[j];
                     x[i] = Math.abs(U[i][i]) > 1e-12 ? (y[i] - sum) / U[i][i] : 0;
                 }
-
-                // Comprobación L * U
                 const LUCheck = Array.from({ length: N }, () => Array(N).fill(0));
                 for (let i = 0; i < N; i++) {
                     for (let j = 0; j < N; j++) {
@@ -416,9 +505,7 @@
                         LUCheck[i][j] = sum;
                     }
                 }
-
                 document.getElementById('vectorXResult').innerHTML = vectorToHTML(x, 'x');
-
                 dynamicResultsPanel.className = 'grid grid-cols-1 md:grid-cols-2 gap-3';
                 dynamicResultsPanel.innerHTML = `
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
@@ -438,12 +525,11 @@
                         <div class="overflow-x-auto">${matrixToHTML(LUCheck)}</div>
                     </div>
                 `;
-
                 document.getElementById('stepsBtnLabel').textContent = "Procedimiento paso a paso (LU)";
                 document.getElementById('stepsContainer').innerHTML = steps.map(s => `<div>${s}</div>`).join('');
             }
 
-            // 2. JACOBI (Actualizado sin caracteres raros)
+            // 2. JACOBI - Intacto
             function solveJacobi(A, b) {
                 const tol = parseFloat(document.getElementById('tolInput').value) || 0.0001;
                 const maxIter = parseInt(document.getElementById('maxIterInput').value) || 100;
@@ -452,11 +538,9 @@
                 document.querySelectorAll('.cell-x0').forEach(input => {
                     x0.push(parseFloat(input.value) || 0);
                 });
-
                 const steps = [];
                 let isEDD = true;
                 const eddDetails = [];
-
                 for (let i = 0; i < N; i++) {
                     let diag = Math.abs(A[i][i]);
                     let sum = 0;
@@ -467,16 +551,13 @@
                     if (!condition) isEDD = false;
                     eddDetails.push({ fila: i + 1, diag, sum, condition });
                 }
-
                 let hasZeroDiag = A.some((row, i) => Math.abs(row[i]) < 1e-12);
-
                 const statusAlert = document.getElementById('statusAlert');
                 if (hasZeroDiag) {
                     statusAlert.className = 'p-2.5 rounded-lg text-xs bg-red-100 text-red-800 border border-red-300 flex items-center gap-2';
                     statusAlert.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> <span><b>Error:</b> Hay ceros en la diagonal principal.</span>';
                     return;
                 }
-
                 if (isEDD) {
                     statusAlert.className = 'p-2.5 rounded-lg text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-2';
                     statusAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span><b>Matriz EDD Detectada:</b> Convergencia de Jacobi garantizada.</span>';
@@ -484,17 +565,13 @@
                     statusAlert.className = 'p-2.5 rounded-lg text-xs bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-2';
                     statusAlert.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span><b>Advertencia:</b> No es EDD. La convergencia no está garantizada.</span>';
                 }
-
                 let currX = [...x0];
                 let iterHistory = [{ iter: 0, x: [...currX], error: null }];
-
                 let converged = false;
                 let k = 0;
-
                 while (k < maxIter && !converged) {
                     k++;
                     let nextX = Array(N).fill(0);
-                    
                     for (let i = 0; i < N; i++) {
                         let sum = 0;
                         for (let j = 0; j < N; j++) {
@@ -502,22 +579,17 @@
                         }
                         nextX[i] = (b[i] - sum) / A[i][i];
                     }
-
                     let maxError = 0;
                     for (let i = 0; i < N; i++) {
                         let err = Math.abs(nextX[i]) > 1e-12 ? Math.abs((nextX[i] - currX[i]) / nextX[i]) : Math.abs(nextX[i] - currX[i]);
                         if (err > maxError) maxError = err;
                     }
-
                     iterHistory.push({ iter: k, x: [...nextX], error: maxError });
                     steps.push(`Iteración ${k}: x = [${nextX.map(v=>v.toFixed(5)).join(', ')}], Error = ${(maxError*100).toFixed(4)}%`);
-
                     if (maxError < tol) converged = true;
                     currX = [...nextX];
                 }
-
                 document.getElementById('vectorXResult').innerHTML = vectorToHTML(currX, 'x');
-
                 let tableHtml = `
                     <div class="overflow-x-auto border border-slate-200 rounded-lg">
                         <table class="w-full text-center text-xs border-collapse">
@@ -525,7 +597,6 @@
                                 <tr><th class="p-1.5 border-r">k</th>`;
                 for (let j = 0; j < N; j++) tableHtml += `<th class="p-1.5 border-r">x<sub>${j+1}</sub></th>`;
                 tableHtml += `<th class="p-1.5">Error Rel. (%)</th></tr></thead><tbody>`;
-
                 iterHistory.forEach(h => {
                     tableHtml += `<tr class="border-b font-mono"><td class="p-1 border-r font-bold bg-slate-50">${h.iter}</td>`;
                     h.x.forEach(val => tableHtml += `<td class="p-1 border-r">${val.toFixed(6)}</td>`);
@@ -533,7 +604,6 @@
                     tableHtml += `<td class="p-1 text-indigo-700 font-semibold">${errDisp}</td></tr>`;
                 });
                 tableHtml += `</tbody></table></div>`;
-
                 dynamicResultsPanel.className = 'grid grid-cols-1 gap-3';
                 dynamicResultsPanel.innerHTML = `
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
@@ -552,9 +622,296 @@
                         ${tableHtml}
                     </div>
                 `;
-
                 document.getElementById('stepsBtnLabel').textContent = "Procedimiento paso a paso (Jacobi)";
                 document.getElementById('stepsContainer').innerHTML = steps.map(s => `<div>${s}</div>`).join('');
+            }
+
+            // 3. NUEVO MÉTODO: Interpolación de Lagrange
+            function solveLagrange(x, y) {
+                const steps = [];
+                steps.push(`=== INTERPOLACIÓN DE LAGRANGE ===`);
+                steps.push(`Puntos ingresados (n = ${x.length}):`);
+                for (let i = 0; i < x.length; i++) {
+                    steps.push(`P${i+1} = (${x[i]}, ${y[i]})`);
+                }
+
+                const evalXVal = parseFloat(document.getElementById('evalXInput').value);
+                let evalResult = null;
+
+                // Construir polinomios base L_i(x) y evaluar P(x)
+                if (!isNaN(evalXVal)) {
+                    evalResult = 0;
+                    for (let i = 0; i < x.length; i++) {
+                        let term = y[i];
+                        let termSteps = [];
+                        for (let j = 0; j < x.length; j++) {
+                            if (i !== j) {
+                                term *= (evalXVal - x[j]) / (x[i] - x[j]);
+                                termSteps.push(`(x* - x_${j+1}) / (x_${i+1} - x_${j+1}) = (${evalXVal} - ${x[j]}) / (${x[i]} - ${x[j]})`);
+                            }
+                        }
+                        steps.push(`L_${i}(${evalXVal}) con y_${i+1} = ${y[i]}: contribución = ${term.toFixed(6)}`);
+                        evalResult += term;
+                    }
+                    steps.push(`P(${evalXVal}) = ${evalResult.toFixed(6)}`);
+                }
+
+                const statusAlert = document.getElementById('statusAlert');
+                statusAlert.className = 'p-2.5 rounded-lg text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-2';
+                statusAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span><b>Interpolación Exitosa:</b> Polinomio de Lagrange generado correctamente.</span>';
+
+                // Mostrar resumen de polinomios base y explicación
+                let basisHtml = '<div class="space-y-2 text-xs font-mono">';
+                basisHtml += `<div class="p-2 bg-white border rounded shadow-sm"><b>Número de puntos:</b> ${x.length} (Grado máximo: ${x.length - 1})</div>`;
+                if (!isNaN(evalXVal)) {
+                    basisHtml += `<div class="p-2 bg-indigo-50 border border-indigo-200 rounded shadow-sm text-indigo-950 font-bold">Evaluación en x = ${evalXVal} &rarr; P(${evalXVal}) = ${evalResult.toFixed(6)}</div>`;
+                } else {
+                    basisHtml += `<div class="p-2 bg-slate-50 border rounded text-slate-500 italic">Consejo: Ingrese un valor en "Valor a Evaluar (x opcional)" en el panel izquierdo para calcular P(x).</div>`;
+                }
+                basisHtml += '</div>';
+
+                document.getElementById('vectorXResult').innerHTML = !isNaN(evalXVal) ? 
+                    `P(${evalXVal}) = <b>${evalResult.toFixed(6)}</b>` : 
+                    `Polinomio construido con ${x.length} puntos. (Ingrese x para evaluar)`;
+
+                dynamicResultsPanel.className = 'grid grid-cols-1 gap-3';
+                dynamicResultsPanel.innerHTML = `
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <h3 class="text-xs font-bold text-slate-700 mb-2">Resumen de Interpolación de Lagrange</h3>
+                        ${basisHtml}
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <h3 class="text-xs font-bold text-slate-700 mb-2">Gráfica de los puntos y polinomio interpolante</h3>
+                        <div class="w-full overflow-x-auto">
+                            <canvas id="lagrangeGraph" class="w-full border border-slate-200 rounded-lg bg-white" style="height: 360px;"></canvas>
+                        </div>
+                    </div>
+                `;
+
+                // Graficar los puntos ingresados y el polinomio de Lagrange
+                drawLagrangeGraph(x, y);
+
+                document.getElementById('stepsBtnLabel').textContent = "Procedimiento paso a paso (Lagrange)";
+                document.getElementById('stepsContainer').innerHTML = steps.map(s => `<div>${s}</div>`).join('');
+            }
+
+            // Gráfica de Lagrange: puntos ingresados + polinomio interpolante
+            function drawLagrangeGraph(xPoints, yPoints) {
+                const canvas = document.getElementById('lagrangeGraph');
+                if (!canvas || !xPoints.length) return;
+
+                const rect = canvas.getBoundingClientRect();
+                const width = Math.max(rect.width, 500);
+                const height = 360;
+                const dpr = window.devicePixelRatio || 1;
+
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                canvas.style.height = height + 'px';
+
+                const ctx = canvas.getContext('2d');
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, width, height);
+
+                // Función para evaluar el polinomio de Lagrange
+                function evaluateLagrange(xValue) {
+                    let result = 0;
+
+                    for (let i = 0; i < xPoints.length; i++) {
+                        let term = yPoints[i];
+
+                        for (let j = 0; j < xPoints.length; j++) {
+                            if (i !== j) {
+                                term *= (xValue - xPoints[j]) / (xPoints[i] - xPoints[j]);
+                            }
+                        }
+
+                        result += term;
+                    }
+
+                    return result;
+                }
+
+                const padding = { left: 55, right: 25, top: 25, bottom: 45 };
+                const graphWidth = width - padding.left - padding.right;
+                const graphHeight = height - padding.top - padding.bottom;
+
+                let minX = Math.min(...xPoints);
+                let maxX = Math.max(...xPoints);
+                let minY = Math.min(...yPoints);
+                let maxY = Math.max(...yPoints);
+
+                // Margen para que los puntos no queden pegados a los bordes
+                const xRange = maxX - minX || 1;
+                const yRange = maxY - minY || 1;
+
+                minX -= xRange * 0.15;
+                maxX += xRange * 0.15;
+                minY -= yRange * 0.20;
+                maxY += yRange * 0.20;
+
+                // Evitar un rango vertical demasiado pequeño
+                if (Math.abs(maxY - minY) < 1e-9) {
+                    minY -= 1;
+                    maxY += 1;
+                }
+
+                function toCanvasX(value) {
+                    return padding.left + ((value - minX) / (maxX - minX)) * graphWidth;
+                }
+
+                function toCanvasY(value) {
+                    return height - padding.bottom - ((value - minY) / (maxY - minY)) * graphHeight;
+                }
+
+                // Fondo
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, width, height);
+
+                // Rejilla
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 1;
+
+                const gridLines = 10;
+
+                for (let i = 0; i <= gridLines; i++) {
+                    const gx = padding.left + (i / gridLines) * graphWidth;
+                    const gy = padding.top + (i / gridLines) * graphHeight;
+
+                    ctx.beginPath();
+                    ctx.moveTo(gx, padding.top);
+                    ctx.lineTo(gx, height - padding.bottom);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(padding.left, gy);
+                    ctx.lineTo(width - padding.right, gy);
+                    ctx.stroke();
+                }
+
+                // Ejes X e Y
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 1.5;
+
+                if (minY <= 0 && maxY >= 0) {
+                    const axisY = toCanvasY(0);
+                    ctx.beginPath();
+                    ctx.moveTo(padding.left, axisY);
+                    ctx.lineTo(width - padding.right, axisY);
+                    ctx.stroke();
+                }
+
+                if (minX <= 0 && maxX >= 0) {
+                    const axisX = toCanvasX(0);
+                    ctx.beginPath();
+                    ctx.moveTo(axisX, padding.top);
+                    ctx.lineTo(axisX, height - padding.bottom);
+                    ctx.stroke();
+                }
+
+                // Etiquetas de ejes
+                ctx.fillStyle = '#475569';
+                ctx.font = '11px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('x', width - padding.right + 10, height - padding.bottom + 4);
+
+                ctx.save();
+                ctx.translate(15, padding.top - 5);
+                ctx.rotate(-Math.PI / 2);
+                ctx.fillText('y', 0, 0);
+                ctx.restore();
+
+                // Etiquetas de valores mínimo y máximo
+                ctx.fillStyle = '#64748b';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(minX.toFixed(2), padding.left, height - padding.bottom + 18);
+                ctx.fillText(maxX.toFixed(2), width - padding.right, height - padding.bottom + 18);
+
+                ctx.textAlign = 'right';
+                ctx.fillText(maxY.toFixed(2), padding.left - 8, padding.top + 4);
+                ctx.fillText(minY.toFixed(2), padding.left - 8, height - padding.bottom);
+
+                // Dibujar el polinomio interpolante
+                const curveSamples = Math.max(300, width);
+
+                ctx.strokeStyle = '#4f46e5';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+
+                let firstPoint = true;
+
+                for (let i = 0; i <= curveSamples; i++) {
+                    const xValue = minX + (i / curveSamples) * (maxX - minX);
+                    const yValue = evaluateLagrange(xValue);
+
+                    if (!Number.isFinite(yValue)) {
+                        firstPoint = true;
+                        continue;
+                    }
+
+                    const px = toCanvasX(xValue);
+                    const py = toCanvasY(yValue);
+
+                    if (firstPoint) {
+                        ctx.moveTo(px, py);
+                        firstPoint = false;
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+
+                ctx.stroke();
+
+                // Dibujar los puntos ingresados
+                xPoints.forEach((xValue, index) => {
+                    const px = toCanvasX(xValue);
+                    const py = toCanvasY(yPoints[index]);
+
+                    ctx.beginPath();
+                    ctx.arc(px, py, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#dc2626';
+                    ctx.fill();
+                    ctx.strokeStyle = '#991b1b';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                    // Etiqueta del punto
+                    ctx.fillStyle = '#1e293b';
+                    ctx.font = 'bold 10px Arial';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(`P${index + 1} (${xValue}, ${yPoints[index]})`, px + 7, py - 7);
+                });
+
+                // Leyenda
+                const legendX = padding.left + 10;
+                const legendY = padding.top + 15;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 1;
+                ctx.fillRect(legendX - 6, legendY - 13, 185, 38);
+                ctx.strokeRect(legendX - 6, legendY - 13, 185, 38);
+
+                ctx.strokeStyle = '#4f46e5';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(legendX, legendY - 2);
+                ctx.lineTo(legendX + 25, legendY - 2);
+                ctx.stroke();
+
+                ctx.fillStyle = '#334155';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText('Polinomio P(x)', legendX + 32, legendY + 2);
+
+                ctx.beginPath();
+                ctx.arc(legendX + 12, legendY + 14, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#dc2626';
+                ctx.fill();
+
+                ctx.fillStyle = '#334155';
+                ctx.fillText('Puntos ingresados', legendX + 32, legendY + 18);
             }
         });
     </script>
